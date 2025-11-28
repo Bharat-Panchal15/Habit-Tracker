@@ -150,3 +150,80 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging System Setup
+
+APP_LOG_LEVEL = os.getenv("APP_LOG_LEVEL", "DEBUG")
+DJANGO_LOG_LEVEL = os.getenv("DJANGO_LOG_LEVEL", "INFO")
+API_LOG_LEVEL = os.getenv("API_LOG_LEVEL", "INFO")
+ERROR_LOG_LEVEL = os.getenv("ERROR_LOG_LEVEL", "ERROR")
+
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "[{levelname}] {asctime} {name}: {message}",
+            "style": "{"
+        },
+        "verbose": {
+            "format": "[{levelname}] {asctime} {name} ({pathname}: {lineno}): {message}",
+            "style": "{",
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
+            "level": APP_LOG_LEVEL,
+        },
+        "debug_file": {
+            "class": "logging.FileHandler",
+            "filename": LOG_DIR / "debug.log",
+            "formatter": "verbose",
+            "level": APP_LOG_LEVEL,
+        },
+        "error_file": {
+            "class": "logging.FileHandler",
+            "filename": LOG_DIR / "error.log",
+            "formatter": "verbose",    
+            "level": ERROR_LOG_LEVEL,
+        },
+        "django_file": {
+            "class": "logging.FileHandler",
+            "filename": LOG_DIR / "django.log",
+            "formatter": "standard",
+            "level": DJANGO_LOG_LEVEL,
+        },
+        "api_file": {
+            "class": "logging.FileHandler",
+            "filename": LOG_DIR / "api.log",
+            "formatter": "standard",
+            "level": API_LOG_LEVEL,
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["django_file","console"],
+            "level": DJANGO_LOG_LEVEL,
+            "propagate": False,
+        },
+        "django.request":{
+            "handlers": ["error_file","console"],
+            "level": ERROR_LOG_LEVEL,
+            "propagate": False,
+        },
+        "api": {
+            "handlers": ["api_file","console"],
+            "level": APP_LOG_LEVEL,
+            "propagate": False,
+        },
+        "": {
+            "handlers": ["debug_file","console"],
+            "level": APP_LOG_LEVEL,
+        },
+    },
+}
