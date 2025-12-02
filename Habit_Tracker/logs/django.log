@@ -1,6 +1,0 @@
-[INFO] 2025-11-28 19:45:55,969 django.utils.autoreload: C:\Users\HP\Desktop\New Project Folder\Habit-Tracker\Habit_Tracker\Habit_Tracker\urls.py changed, reloading.
-[INFO] 2025-11-28 19:45:56,717 django.utils.autoreload: Watching for file changes with StatReloader
-[INFO] 2025-11-28 19:45:59,185 django.utils.autoreload: C:\Users\HP\Desktop\New Project Folder\Habit-Tracker\Habit_Tracker\Habit_Tracker\urls.py changed, reloading.
-[INFO] 2025-11-28 19:45:59,930 django.utils.autoreload: Watching for file changes with StatReloader
-[INFO] 2025-11-28 19:46:01,237 django.utils.autoreload: C:\Users\HP\Desktop\New Project Folder\Habit-Tracker\Habit_Tracker\Habit_Tracker\urls.py changed, reloading.
-[INFO] 2025-11-28 19:46:02,028 django.utils.autoreload: Watching for file changes with StatReloader
