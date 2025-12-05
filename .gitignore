@@ -6,3 +6,4 @@ env/
 *.sqlite3
 .DS_Store
 vscode/
+.pytest_cache/
