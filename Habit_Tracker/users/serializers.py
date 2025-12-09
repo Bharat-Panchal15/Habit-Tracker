@@ -89,6 +89,9 @@ class LoginSerializer(serializers.Serializer):
 class LogoutSerializer(serializers.Serializer):
     """Blacklists a JWT refresh token to log the user out. Requires SimpleJWT token_blacklist app to be enabled."""
     refresh_token = serializers.CharField()
+    default_error_messages = {
+        "invalid": "Invalid or expired token"
+    }
 
     def validate(self, data):
         """Store refresh token for blacklisting."""
@@ -100,4 +103,4 @@ class LogoutSerializer(serializers.Serializer):
         try:
             RefreshToken(self.refresh_token).blacklist()
         except Exception:
-            self.fail("Invalid Token")
+            self.fail("invalid")
