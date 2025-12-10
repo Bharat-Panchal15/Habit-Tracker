@@ -1,3 +1,4 @@
+from django.utils.crypto import get_random_string
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from users.models import User
@@ -21,8 +22,9 @@ class GuestUserSerializer(serializers.Serializer):
         """Generate random guest credentials and create User instance."""
         random_str = "".join(random.choices(string.ascii_letters + string.digits,k=8))
         username = f"Guest_{random_str}"
+        password = get_random_string(15)
 
-        user = User.objects.create_user(username=username,password=User.objects.make_random_password(), is_guest=True)
+        user = User.objects.create_user(username=username,password=password, is_guest=True)
 
         return user
 
