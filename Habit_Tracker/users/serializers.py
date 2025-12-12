@@ -38,11 +38,11 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     def validate_username(self, username):
         """Ensure username doesn't contain '@' or email patterns."""
-        if "@" in username:
-            raise serializers.ValidationError("Username cannot contain '@' symbol")
-        
         if re.match(r".+@.+\..+",username): # Pattern: something@something.something
             raise serializers.ValidationError("Username cannot look like an email")
+        
+        if "@" in username:
+            raise serializers.ValidationError("Username cannot contain '@' symbol")
         
         username = username.strip()
         return username
