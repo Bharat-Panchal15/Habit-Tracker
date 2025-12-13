@@ -7,7 +7,6 @@ from users.permissions import IsAnonymous
 from users.models import User
 from users.serializers import UserSerializer, GuestUserSerializer, RegisterSerializer, LoginSerializer, LogoutSerializer
 
-
 # Helper: build token pair for a user
 def _get_token_pair_for_user(user: User):
     refresh = RefreshToken.for_user(user)
