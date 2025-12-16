@@ -6,3 +6,5 @@ env/
 *.sqlite3
 .DS_Store
 vscode/
+logs/
+*.log
