@@ -3,10 +3,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.exceptions import ValidationError
 from users.permissions import IsAnonymous
 from users.models import User
 from users.serializers import UserSerializer, GuestUserSerializer, RegisterSerializer, LoginSerializer, LogoutSerializer
+import logging
 
+logger = logging.getLogger("api.users")
 # Helper: build token pair for a user
 def _get_token_pair_for_user(user: User):
     refresh = RefreshToken.for_user(user)
@@ -34,6 +37,16 @@ class GuestUserView(APIView):
         serializer = GuestUserSerializer(data=request.data or {})
         if serializer.is_valid():
             user = serializer.save()
+
+            logger.info(
+                "Guest User created successfully",
+                extra={
+                    "user_id": user.id,
+                    "username": user.username,
+                    "is_guest": user.is_guest,
+                },
+            )
+
             access_token, refresh_token = _get_token_pair_for_user(user)
             user_data = UserSerializer(user, context={"request": request}).data
 
@@ -80,6 +93,16 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data or {})
         if serializer.is_valid():
             user = serializer.save()
+
+            logger.info(
+                "User registration successful",
+                extra={
+                    "user_id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                },
+            )
+
             access_token, refresh_token = _get_token_pair_for_user(user)
             user_data = UserSerializer(user, context={"request": request}).data
 
@@ -124,6 +147,15 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data or {})
         if serializer.is_valid():
             user = serializer.validated_data["user"]
+
+            logger.info(
+                "User login successful",
+                extra={
+                    "user_id": user.id,
+                    "username": user.username,
+                },
+            )
+
             access_token, refresh_token = _get_token_pair_for_user(user)
             user_data = UserSerializer(user, context={"request": request}).data
 
@@ -134,6 +166,14 @@ class LoginView(APIView):
                     "refresh": refresh_token,
                 }, status=status.HTTP_200_OK
             )
+
+        logger.warning(
+            "User login failed",
+            extra={
+                "identifier": request.data.get("identifier"),
+            },
+        )
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LogoutView(APIView):
@@ -161,6 +201,32 @@ class LogoutView(APIView):
     def post(self, request):
         serializer = LogoutSerializer(data=request.data or {})
         if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            try:
+                serializer.save()
+
+                logger.info(
+                    "User logout successful",
+                    extra={
+                        "user_id": request.user.id,
+                        "username": request.user.username,
+                    },
+                )
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            except ValidationError:
+                logger.warning(
+                    "User logout failed due to invalid token",
+                    extra={
+                        "user_id": request.user.id,
+                        "username": request.user.username,
+                    },
+                )
+                raise # let DRF return the proper error response
+
+        logger.warning(
+            "Logout validation failed",
+            extra={
+                "user_id": request.user.id,
+                "username": request.user.username,
+            },
+        )    
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
